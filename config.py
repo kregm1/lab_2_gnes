@@ -17,7 +17,15 @@ class Config:
     KNOWLEDGE_BASE_FILE = BASE_DIR / "knowledge_base.json"
     SIMILARITY_THRESHOLD = 0.7
     MESSAGE_LIMIT_SECONDS = 10
-    SYSTEM_PROMPT = "Ты эксперт по мониторингу активности..."
+    TOPIC_KEYWORDS = [
+        "мониторинг" , "активность" , "безопасность" , "риск" , "сотрудник" ,
+        "анализ" , "NLP" , "угроза" , "информация" , "конфиденциальность"
+    ]
+    SYSTEM_PROMPT = """Ты - эксперт по системам мониторинга онлайн-активности для оценки рисков безопасности. 
+    Отвечай только на вопросы по этой теме. Отвечай кратко и точно на русском языке. 
+    Если вопрос не по теме, вежливо сообщи, что не можешь помочь."""
+    YANDEX_GPT_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion"
+
 
     @classmethod
     def validate (cls):

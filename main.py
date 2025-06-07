@@ -28,7 +28,7 @@ class BotHandlers:
     def __init__ (self , knowledge_base: KnowledgeBase):
         self.knowledge_base = knowledge_base
 
-    async def start(self, update):
+    async def start(self, update, context):
         user = update.effective_user
         await update.message.reply_text(
             f"Привет, {user.first_name}! Я бот для анализа систем мониторинга онлайн-активности.\n"
@@ -40,7 +40,7 @@ class BotHandlers:
             "Задайте ваш вопрос или введите /help для списка команд."
         )
 
-    async def help_command(self, update):
+    async def help_command(self, update, context):
         help_text = """
 Доступные команды:
 /start - начать работу с ботом
@@ -52,7 +52,7 @@ class BotHandlers:
 """
         await update.message.reply_text(help_text)
 
-    async def handle_message(self, update):
+    async def handle_message(self, update, context):
         user_id = update.effective_user.id
 
         if not check_message_limit(user_id):
@@ -80,7 +80,7 @@ class BotHandlers:
             else:
                 await update.message.reply_text("Не удалось получить ответ.")
 
-    async def feedback_handler(self, update):
+    async def feedback_handler(self, update, context):
         query = update.callback_query
         await query.answer()
 
@@ -113,7 +113,7 @@ class BotHandlers:
         context.user_data.pop('last_question' , None)
         context.user_data.pop('last_answer' , None)
 
-    async def feedback_command(self, update):
+    async def feedback_command(self, update, context):
         user_id = update.effective_user.id
 
         if not check_message_limit(user_id):
@@ -123,7 +123,7 @@ class BotHandlers:
         await update.message.reply_text("Напишите ваши предложения по улучшению:")
         return GIVING_FEEDBACK
 
-    async def receive_feedback(self, update):
+    async def receive_feedback(self, update, context):
         feedback = update.message.text
         user_id = update.effective_user.id
 
@@ -131,7 +131,7 @@ class BotHandlers:
         await update.message.reply_text("Спасибо за обратную связь!")
         return ConversationHandler.END
 
-    async def add_question_command(self, update):
+    async def add_question_command(self, update, context):
         user_id = update.effective_user.id
 
         if not check_message_limit(user_id):
@@ -148,7 +148,7 @@ class BotHandlers:
         )
         return ADDING_QUESTION
 
-    async def receive_question_answer(self, update):
+    async def receive_question_answer(self, update, context):
         user_id = update.effective_user.id
         text = update.message.text
 
@@ -168,7 +168,7 @@ class BotHandlers:
         )
         return ConversationHandler.END
 
-    async def show_db(self, update):
+    async def show_db(self, update, context):
         try:
             if not self.knowledge_base.base:
                 await update.message.reply_text("📚 База знаний пуста")
@@ -186,7 +186,7 @@ class BotHandlers:
             logger.error(f"Ошибка показа базы знаний: {e}")
             await update.message.reply_text("Временные проблемы с доступом к базе знаний")
 
-    async def cancel(self, update):
+    async def cancel(self, update, context):
         await update.message.reply_text("Отменено.")
         return ConversationHandler.END
 

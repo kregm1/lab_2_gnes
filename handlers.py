@@ -17,7 +17,8 @@ class BotHandlers:
     def __init__(self, knowledge_base: KnowledgeBase):
         self.knowledge_base = knowledge_base
 
-    def start(self, update: Update) -> None:
+    @staticmethod
+    def start(update: Update, context: CallbackContext) -> None:
         user = update.effective_user
         update.message.reply_text(
             f"Привет, {user.first_name}! Я бот для анализа систем мониторинга онлайн-активности.\n"
@@ -29,7 +30,7 @@ class BotHandlers:
             "Задайте ваш вопрос или введите /help для списка команд."
         )
 
-    def help_command(self, update: Update) -> None:
+    def help_command(self, update: Update, context: CallbackContext) -> None:
         help_text = """
 Доступные команды:
 /start - начать работу с ботом
@@ -41,7 +42,7 @@ class BotHandlers:
 """
         update.message.reply_text(help_text)
 
-    def handle_message(self, update: Update) -> None:
+    def handle_message(self, update: Update, context: CallbackContext) -> None:
         user_id = update.effective_user.id
 
         if not check_message_limit(user_id):
@@ -90,7 +91,7 @@ class BotHandlers:
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text("Сохранить этот вопрос и ответ в базу знаний?" , reply_markup=reply_markup)
 
-    def feedback_handler(self, update: Update) -> None:
+    def feedback_handler(self, update: Update, context: CallbackContext) -> None:
         query = update.callback_query
         query.answer()
 
@@ -102,7 +103,7 @@ class BotHandlers:
         logger.info(f"Feedback from {user_id}: {feedback_type}")
         query.edit_message_text("Спасибо за оценку!")
 
-    def save_question_handler(self, update: Update) -> None:
+    def save_question_handler(self, update: Update, context: CallbackContext) -> None:
         query = update.callback_query
         query.answer()
 
@@ -121,7 +122,7 @@ class BotHandlers:
         self.knowledge_base.add_question_answer(question, full_answer)
         query.edit_message_text("Вопрос и ответ сохранены!")
 
-    def feedback_command(self, update: Update) -> int:
+    def feedback_command(self, update: Update, context: CallbackContext) -> int:
         user_id = update.effective_user.id
 
         if not check_message_limit(user_id):
@@ -131,7 +132,7 @@ class BotHandlers:
         update.message.reply_text("Напишите ваши предложения по улучшению:")
         return GIVING_FEEDBACK
 
-    def receive_feedback(self, update: Update) -> int:
+    def receive_feedback(self, update: Update, context: CallbackContext) -> int:
         feedback = update.message.text
         user_id = update.effective_user.id
 
@@ -139,7 +140,7 @@ class BotHandlers:
         update.message.reply_text("Спасибо за обратную связь!")
         return ConversationHandler.END
 
-    def add_question_command(self, update: Update) -> int:
+    def add_question_command(self, update: Update, context: CallbackContext) -> int:
         user_id = update.effective_user.id
 
         if not check_message_limit(user_id):
@@ -156,7 +157,7 @@ class BotHandlers:
         )
         return ADDING_QUESTION
 
-    def receive_question_answer(self, update: Update) -> int:
+    def receive_question_answer(self, update: Update, context: CallbackContext) -> int:
         user_id = update.effective_user.id
         text = update.message.text
 
@@ -176,9 +177,9 @@ class BotHandlers:
         )
         return ConversationHandler.END
 
-    def cancel(self, update: Update) -> int:
+    def cancel(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text("Отменено.")
         return ConversationHandler.END
 
-    def error(self, context: CallbackContext) -> None:
+    def error(self, update: Update, context: CallbackContext) -> None:
         logger.warning(f'Error: {context.error}')
